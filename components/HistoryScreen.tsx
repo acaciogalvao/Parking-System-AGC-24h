@@ -1,7 +1,7 @@
 import React from 'react';
 import { ParkingRecord, ParkingStatus, PaymentMethod, VehicleType } from '../types';
 import { ArrowDownCircle, Clock, Calendar, Timer, Car, Bike, Truck } from 'lucide-react';
-import { formatCurrency } from '../services/storageService';
+import { formatCurrency } from '../services/apiService';
 
 interface HistoryScreenProps {
   records: ParkingRecord[];

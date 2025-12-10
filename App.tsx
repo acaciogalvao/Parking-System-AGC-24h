@@ -5,7 +5,7 @@ import EntryScreen from './components/EntryScreen';
 import ExitScreen from './components/ExitScreen';
 import HistoryScreen from './components/HistoryScreen';
 import SettingsScreen from './components/SettingsScreen';
-import { getRecords, initData } from './services/storageService';
+import { getRecords, initData } from './services/apiService';
 import { ParkingRecord } from './types';
 
 enum View {

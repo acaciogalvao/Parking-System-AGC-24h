@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { ParkingRecord, ParkingStatus, VehicleType, AppConfig } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Car, DollarSign, Activity, Clock, Truck, Bike, Map as MapIcon, HardDrive, TrendingUp } from 'lucide-react';
-import { formatCurrency, getConfig } from '../services/storageService';
+import { formatCurrency, getConfig } from '../services/apiService';
 
 interface DashboardProps {
   records: ParkingRecord[];

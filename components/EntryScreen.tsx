@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { VehicleType, ParkingRecord, ParkingStatus } from '../types';
-import { saveRecord, getConfig, getOccupiedSpots, getRecords } from '../services/storageService';
+import { saveRecord, getConfig, getOccupiedSpots, getRecords } from '../services/apiService';
 import { analyzeLicensePlate } from '../services/geminiService';
 import { Camera, Loader2, Save, Car, Truck, Bike, CheckCircle2, AlertCircle, Ban } from 'lucide-react';
 

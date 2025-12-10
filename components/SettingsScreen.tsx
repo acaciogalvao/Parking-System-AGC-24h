@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VehicleType, Rates, AppConfig, PixKeyType } from '../types';
-import { getRates, saveRates, getConfig, saveConfig } from '../services/storageService';
+import { getRates, saveRates, getConfig, saveConfig } from '../services/apiService';
 import { Save, Car, Truck, Bike, Wallet, CheckCircle, AlertCircle, ChevronDown, Loader2 } from 'lucide-react';
 
 interface SettingsScreenProps {

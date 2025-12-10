@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ParkingRecord, ParkingStatus, PaymentMethod, PixKeyType } from '../types';
-import { calculateCost, updateRecord, formatCurrency, getConfig, generatePixPayload } from '../services/storageService';
+import { calculateCost, updateRecord, formatCurrency, getConfig, generatePixPayload, checkPaymentStatus, createPaymentIntent } from '../services/apiService';
 import { Search, CheckCircle, CreditCard, Clock, QrCode, Banknote, Copy, X, Loader2, Check, LockOpen, AlertCircle, ShieldCheck, ArrowRight } from 'lucide-react';
 import LiveSpot from './LiveSpot';
 
