@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ParkingRecord, ParkingStatus, VehicleType } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Car, DollarSign, Activity, Clock, Truck, Bike, Map as MapIcon, HardDrive, TrendingUp } from 'lucide-react';
-import { formatCurrency, getConfig } from '../services/apiService';\nimport StatusIndicator from './StatusIndicator';
+import { formatCurrency, getConfig } from '../services/apiService';
+import StatusIndicator from './StatusIndicator';
 
 interface DashboardProps {
   records: ParkingRecord[];
@@ -69,8 +70,7 @@ const Dashboard: React.FC<DashboardProps> = ({ records }) => {
            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
         <div className="flex items-center gap-2">
-            
-<StatusIndicator />
+            <StatusIndicator />
         </div>
       </div>
 
