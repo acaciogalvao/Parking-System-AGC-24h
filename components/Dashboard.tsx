@@ -70,7 +70,7 @@ const Dashboard: React.FC<DashboardProps> = ({ records }) => {
         </div>
         <div className="flex items-center gap-2">
             
-            <StatusIndicator />\n            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-colors bg-slate-100 text-slate-500 border-slate-200">\n                <HardDrive size={12} />\n                MODO LOCAL\n            </div>
+<StatusIndicator />
         </div>
       </div>
 
