@@ -7,21 +7,8 @@ const fs = require('fs');
 const path = require('path');
 
 // --- CARREGAMENTO DE CONFIGURAÇÃO ---
-const loadConfig = () => {
-    const envVisiblePath = path.join(__dirname, 'env_visible.txt');
-    if (fs.existsSync(envVisiblePath)) {
-        try {
-            const data = fs.readFileSync(envVisiblePath, 'utf8');
-            data.split('\n').forEach(line => {
-                const [key, ...value] = line.split('=');
-                if (key && value.length > 0 && !process.env[key.trim()]) {
-                    process.env[key.trim()] = value.join('=').trim();
-                }
-            });
-        } catch (err) { console.error("Erro config:", err); }
-    }
-};
-loadConfig();
+// O dotenv já carrega automaticamente do .env, não é necessário código extra.
+// O arquivo env_visible.txt foi substituído por .env para seguir as boas práticas.
 
 const app = express();
 const PORT = process.env.PORT || 3000;
