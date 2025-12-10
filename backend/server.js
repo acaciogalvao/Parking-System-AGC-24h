@@ -34,6 +34,15 @@ const connectDB = async () => {
     }
 };
 
+// --- HEALTH CHECK ENDPOINT ---
+app.get('/api/health', (req, res) => {
+    if (dbConnected) {
+        res.status(200).json({ status: 'Online', db: 'Connected' });
+    } else {
+        res.status(503).json({ status: 'Offline', db: 'Disconnected' });
+    }
+});
+
 // --- SCHEMAS ---
 const SettingsSchema = new mongoose.Schema({ config: Object, rates: Object }, { timestamps: true });
 const Settings = mongoose.model('Settings', SettingsSchema);

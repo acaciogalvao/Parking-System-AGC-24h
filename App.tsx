@@ -5,6 +5,7 @@ import EntryScreen from './components/EntryScreen';
 import ExitScreen from './components/ExitScreen';
 import HistoryScreen from './components/HistoryScreen';
 import SettingsScreen from './components/SettingsScreen';
+import StatusIndicator from './components/StatusIndicator';
 import { getRecords, initData } from './services/apiService';
 import { ParkingRecord } from './types';
 
@@ -76,7 +77,10 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto no-scrollbar p-6">
+        <main className="flex-1 overflow-y-auto p-6">
+            <div className="flex justify-end mb-4">
+              <StatusIndicator />
+            </div>
             {renderContent()}
         </main>
 

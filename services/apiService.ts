@@ -153,6 +153,18 @@ export const calculateCost = (entryTime: number, exitTime: number, type: Vehicle
   return durationHours * rates[type];
 };
 
+// --- Health Check Operations (API) ---
+
+export const checkHealth = async (): Promise<{ status: 'Online' | 'Offline', db: 'Connected' | 'Disconnected' }> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return { status: 'Offline', db: 'Disconnected' };
+    }
+};
+
 // --- PIX Operations (API) ---
 
 import { generatePixPayload } from './pixService';
