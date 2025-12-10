@@ -7,16 +7,23 @@ interface SettingsScreenProps {
   onBack: () => void;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
-  const [rates, setRates] = useState<Rates>(getRates());
-  const [config, setConfig] = useState<AppConfig>(getConfig());
+const SettingsScreen: React.FC<SettingsScreenProps> = () => {
+  const [rates, setRates] = useState<Rates>({ CAR: 10, MOTORCYCLE: 5, TRUCK: 20 });
+  const [config, setConfig] = useState<AppConfig>({ pixKey: '', pixKeyType: PixKeyType.CPF, totalSpots: { CAR: 50, MOTORCYCLE: 20, TRUCK: 10 } });
   const [toast, setToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isValidKey, setIsValidKey] = useState(true);
 
-  // Validate on load
+  // Load settings on mount
   useEffect(() => {
-    validateKey(config.pixKey, config.pixKeyType);
+    const loadSettings = async () => {
+      const loadedRates = await getRates();
+      const loadedConfig = await getConfig();
+      setRates(loadedRates);
+      setConfig(loadedConfig);
+      validateKey(loadedConfig.pixKey, loadedConfig.pixKeyType);
+    };
+    loadSettings();
   }, []);
 
   const handleRateChange = (type: VehicleType, value: string) => {

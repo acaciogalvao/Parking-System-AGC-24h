@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { ParkingRecord, ParkingStatus, PaymentMethod, PixKeyType } from '../types';
-import { calculateCost, updateRecord, formatCurrency, getConfig, generatePixPayload, checkPaymentStatus, createPaymentIntent } from '../services/apiService';
-import { Search, CheckCircle, CreditCard, Clock, QrCode, Banknote, Copy, X, Loader2, Check, LockOpen, AlertCircle, ShieldCheck, ArrowRight } from 'lucide-react';
+import { ParkingRecord, ParkingStatus, PaymentMethod } from '../types';
+import { updateRecord, formatCurrency, getConfig } from '../services/apiService';
+import { calculateCostSync } from '../services/costHelper';
+import { Search, CheckCircle, CreditCard, QrCode, Banknote, Copy, X, Check, AlertCircle, ShieldCheck, ArrowRight, UnlockKeyhole } from 'lucide-react';
 import LiveSpot from './LiveSpot';
 
 interface ExitScreenProps {
@@ -41,15 +42,12 @@ const CheckoutSheet: React.FC<{
 }> = ({ record, onClose, onConfirm, currentTimestamp }) => {
   
   const [view, setView] = useState<'SELECT' | 'PIX_PENDING' | 'PIX_SUCCESS'>('SELECT');
-  const [pixPayload, setPixPayload] = useState('');
+  const [pixPayload] = useState('');
   
   const frozenTime = useMemo(() => currentTimestamp, []); 
 
   // Gera um TxID CURTO e PADRONIZADO
-  const cleanTxId = useMemo(() => {
-      const cleanId = record.id.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase();
-      return `AGC${cleanId}`;
-  }, [record.id]);
+
 
   const { elapsed, currentCost } = useMemo(() => {
       const diff = frozenTime - record.entryTime;
@@ -58,7 +56,7 @@ const CheckoutSheet: React.FC<{
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
       const elapsedStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      const cost = calculateCost(record.entryTime, frozenTime, record.type);
+      const cost = calculateCostSync(record.entryTime, frozenTime, record.type);
       
       return { elapsed: elapsedStr, currentCost: cost };
   }, [record, frozenTime]);
@@ -70,21 +68,12 @@ const CheckoutSheet: React.FC<{
     }, 1500);
   };
 
-  const handlePixStart = () => {
-      const config = getConfig();
+  const handlePixStart = async () => {
+      const config = await getConfig();
       if (!config?.pixKey) return alert("Configure a Chave Pix!");
       
-      const payload = generatePixPayload(
-          config.pixKey, 
-          config.pixKeyType, 
-          "AGC PARKING", 
-          "BRASIL",      
-          currentCost, 
-          cleanTxId 
-      );
-      
-      setPixPayload(payload);
-      setView('PIX_PENDING');
+      // Funcionalidade PIX desabilitada temporariamente
+      alert("Funcionalidade PIX em desenvolvimento. Use outra forma de pagamento.");
   };
 
   return (
@@ -191,7 +180,7 @@ const CheckoutSheet: React.FC<{
                     <div>
                         <h3 className="font-black text-2xl text-slate-800 tracking-tight">Pagamento Confirmado!</h3>
                         <p className="text-sm text-slate-500 font-medium flex items-center justify-center gap-2 mt-2 bg-slate-50 py-2 rounded-lg mx-auto w-fit px-4">
-                            <LockOpen size={16} className="text-[#5847eb]" /> Liberando vaga {record.spotNumber}...
+                            <UnlockKeyhole size={16} className="text-[#5847eb]" /> Liberando vaga {record.spotNumber}...
                         </p>
                     </div>
                  </div>
@@ -229,7 +218,7 @@ const ExitScreen: React.FC<ExitScreenProps> = ({ records, onUpdate }) => {
   const handleCheckout = async (method: PaymentMethod) => {
     if (!selectedRecord) return;
     const exitTime = Date.now();
-    const cost = calculateCost(selectedRecord.entryTime, exitTime, selectedRecord.type);
+    const cost = calculateCostSync(selectedRecord.entryTime, exitTime, selectedRecord.type);
     
     // Atualiza o registro
     await updateRecord({ 

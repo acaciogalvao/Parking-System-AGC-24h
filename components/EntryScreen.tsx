@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { VehicleType, ParkingRecord, ParkingStatus } from '../types';
 import { saveRecord, getConfig, getOccupiedSpots, getRecords } from '../services/apiService';
-import { analyzeLicensePlate } from '../services/geminiService';
-import { Camera, Loader2, Save, Car, Truck, Bike, CheckCircle2, AlertCircle, Ban } from 'lucide-react';
+import { Camera, Save, Car, Truck, Bike, CheckCircle2, AlertCircle, Ban, Loader2 } from 'lucide-react';
 
 interface EntryScreenProps {
   onSuccess: () => void;
@@ -13,7 +12,7 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onSuccess }) => {
   const [isPlateValid, setIsPlateValid] = useState(false);
   const [type, setType] = useState<VehicleType>(VehicleType.CAR);
   const [selectedSpot, setSelectedSpot] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false); 
@@ -28,7 +27,7 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onSuccess }) => {
 
   useEffect(() => {
     const fetchSpots = async () => {
-        const config = getConfig();
+        const config = await getConfig();
         setCapacity(config.totalSpots[type]);
         const spots = await getOccupiedSpots(type);
         setOccupiedSpots(spots);
@@ -71,20 +70,8 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onSuccess }) => {
     reader.onloadend = async () => {
       const base64 = reader.result as string;
       setImagePreview(base64);
-      setLoading(true);
-      const result = await analyzeLicensePlate(base64);
-      setLoading(false);
-
-      if (result) {
-        const formatted = formatPlate(result.plate);
-        setPlate(formatted);
-        validatePlate(formatted.replace(/[^A-Z0-9]/g, ''));
-        if (result.detectedType) {
-            if (result.detectedType.includes('MOTO')) setType(VehicleType.MOTORCYCLE);
-            else if (result.detectedType.includes('TRUCK')) setType(VehicleType.TRUCK);
-            else setType(VehicleType.CAR);
-        }
-      }
+      // Funcionalidade de reconhecimento de placa removida
+      // Usuário deve digitar a placa manualmente
     };
     reader.readAsDataURL(file);
   };
@@ -178,7 +165,7 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onSuccess }) => {
                             <span className="text-[10px] text-[#5847eb] font-bold uppercase">Foto</span>
                         </>
                     )}
-                    {loading && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><Loader2 className="animate-spin text-[#5847eb]" /></div>}
+
                 </div>
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" capture="environment" className="hidden" />
 

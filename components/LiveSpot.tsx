@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { ParkingRecord, VehicleType } from '../types';
-import { calculateCost, formatCurrency } from '../services/storageService';
+import { formatCurrency } from '../services/apiService';
+import { calculateCostSync } from '../services/costHelper';
 import { Clock, Car, Bike, Truck, ChevronRight } from 'lucide-react';
 
 interface LiveSpotProps {
@@ -18,7 +19,7 @@ const LiveSpot: React.FC<LiveSpotProps> = ({ record, onClick, currentTimestamp }
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
       const elapsedStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      const cost = calculateCost(record.entryTime, currentTimestamp, record.type);
+      const cost = calculateCostSync(record.entryTime, currentTimestamp, record.type);
 
       return { elapsed: elapsedStr, currentCost: cost, isOverHour: hours > 0 };
   }, [record, currentTimestamp]);

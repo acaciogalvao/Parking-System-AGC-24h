@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { ParkingRecord, ParkingStatus, VehicleType, AppConfig } from '../types';
+import React, { useState, useMemo, useEffect } from 'react';
+import { ParkingRecord, ParkingStatus, VehicleType } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Car, DollarSign, Activity, Clock, Truck, Bike, Map as MapIcon, HardDrive, TrendingUp } from 'lucide-react';
 import { formatCurrency, getConfig } from '../services/apiService';
@@ -10,7 +10,11 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ records }) => {
   const [mapType, setMapType] = useState<VehicleType>(VehicleType.CAR);
-  const config = getConfig();
+  const [totalSpots, setTotalSpots] = useState({ CAR: 50, MOTORCYCLE: 20, TRUCK: 10 });
+
+  useEffect(() => {
+    getConfig().then(config => setTotalSpots(config.totalSpots));
+  }, []);
 
   const stats = useMemo(() => {
     const today = new Date().setHours(0, 0, 0, 0);
@@ -38,15 +42,15 @@ const Dashboard: React.FC<DashboardProps> = ({ records }) => {
   }, [records]);
 
   const mapData = useMemo(() => {
-    const totalSpots = config.totalSpots[mapType];
+    const spots = totalSpots[mapType];
     const occupiedSet = new Set(
         records
             .filter(r => r.status === ParkingStatus.ACTIVE && r.type === mapType)
             .map(r => r.spotNumber)
     );
 
-    return { totalSpots, occupiedSet };
-  }, [records, mapType, config]);
+    return { totalSpots: spots, occupiedSet };
+  }, [records, mapType, totalSpots]);
 
   const getOccupancyColor = (type: VehicleType) => {
       switch(type) {
