@@ -21,25 +21,8 @@ if grep -q "<username>" backend/.env 2>/dev/null; then
     echo ""
 fi
 
-echo "🔧 Iniciando backend na porta 3000..."
-cd backend && npm start &
-BACKEND_PID=$!
-
-sleep 3
-
-echo "🎨 Iniciando frontend..."
-cd ..
-npm run dev &
-FRONTEND_PID=$!
-
+echo "🔧 Iniciando backend na porta 3000 e frontend na porta 5173..."
 echo ""
-echo "✅ Sistema iniciado!"
-echo "   Backend: http://localhost:3000"
-echo "   Frontend: http://localhost:5173"
-echo ""
-echo "Pressione Ctrl+C para parar os servidores"
 
-# Aguardar interrupção
-trap "kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT TERM
-
-wait
+# Iniciar ambos com concurrently
+npm run start:all
