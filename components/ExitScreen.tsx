@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ParkingRecord, ParkingStatus, PaymentMethod } from '../types';
-import { updateRecord, formatCurrency, getConfig, generatePixPayload, createPaymentIntent, checkPaymentStatus } from '../services/apiService';
+import { updateRecord, formatCurrency, getConfig, generatePixPayload, createPaymentIntent, checkPaymentStatus, copyToClipboard } from '../services/apiService';
 import { calculateCostSync } from '../services/costHelper';
 import { Search, CheckCircle, CreditCard, QrCode, Banknote, Copy, X, Check, AlertCircle, ShieldCheck, ArrowRight, UnlockKeyhole } from 'lucide-react';
 import LiveSpot from './LiveSpot';
@@ -186,7 +186,7 @@ const CheckoutSheet: React.FC<{
 
                     {/* Botões de Ação */}
                     <div className="grid grid-cols-2 gap-3 w-full">
-                         <button onClick={() => { navigator.clipboard.writeText(pixPayload); alert('Código Copiado!'); }} className="flex items-center justify-center gap-2 text-xs font-bold bg-slate-50 py-3 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">
+                         <button onClick={() => { copyToClipboard(pixPayload); alert('Código Copiado!'); }} className="flex items-center justify-center gap-2 text-xs font-bold bg-slate-50 py-3 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">
                             <Copy size={14}/> Copiar Código
                         </button>
                         <button onClick={() => setView('SELECT')} className="flex items-center justify-center gap-2 text-xs font-bold bg-slate-50 py-3 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">

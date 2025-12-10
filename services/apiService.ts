@@ -158,6 +158,9 @@ export const calculateCost = (entryTime: number, exitTime: number, type: Vehicle
 import { generatePixPayload } from './pixService';
 export { generatePixPayload };
 
+import { copyToClipboard } from './utils';
+export { copyToClipboard };
+
 export const createPaymentIntent = async (txid: string, amount: number): Promise<boolean> => {
     try {
         const response = await fetch(`${API_BASE_URL}/payment/create`, {
