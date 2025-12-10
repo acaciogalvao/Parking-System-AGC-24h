@@ -18,11 +18,48 @@ const generatePixPayload = (pixKey, merchantName, merchantCity, amount, txid) =>
     // Merchant Account Information (26)
     // Subcampos: GUI (00) e Chave Pix (01)
     
-    // ⚠️ CORREÇÃO: Limpar a chave Pix para garantir que não haja caracteres inválidos (ex: em telefone)
+    // ⚠️ CORREÇÃO: Limpar e formatar a chave Pix corretamente
     let cleanPixKey = pixKey;
-    if (pixKey.includes('(') || pixKey.includes('-') || pixKey.includes(' ')) {
-        // Assume que é um telefone e remove tudo que não for dígito ou '+'
-        cleanPixKey = pixKey.replace(/[^0-9+]/g, '');
+    
+    // Remove caracteres especiais, mantém apenas números e +
+    cleanPixKey = cleanPixKey.replace(/[^0-9+@.\-a-zA-Z]/g, '');
+    
+    // Se parece ser um telefone (apenas dígitos ou com formatação), formata corretamente
+    const onlyDigits = cleanPixKey.replace(/[^0-9]/g, '');
+    
+    // Telefone brasileiro: 11 dígitos (DDD + número) - começa com DDD (11-99)
+    // CPF também tem 11 dígitos, mas não começa com DDD válido
+    const looksLikePhone = onlyDigits.length === 11 && 
+                          parseInt(onlyDigits.substring(0, 2)) >= 11 && 
+                          parseInt(onlyDigits.substring(0, 2)) <= 99 &&
+                          (onlyDigits[2] === '9' || pixKey.includes('(') || pixKey.includes('-') || pixKey.includes(' '));
+    
+    if (looksLikePhone && !cleanPixKey.includes('@') && !cleanPixKey.includes('.')) {
+        // Se já tem +55, mantém
+        if (cleanPixKey.startsWith('+55')) {
+            cleanPixKey = cleanPixKey.replace(/[^0-9+]/g, '');
+        }
+        // Se tem 55 no início mas sem +, adiciona o +
+        else if (onlyDigits.startsWith('55') && onlyDigits.length === 13) {
+            cleanPixKey = '+' + onlyDigits;
+        }
+        // Se tem apenas 11 dígitos, adiciona +55
+        else {
+            cleanPixKey = '+55' + onlyDigits;
+        }
+    }
+    // Para outros tipos de chave (CPF, CNPJ, email, aleatória), apenas limpa caracteres inválidos
+    else if (cleanPixKey.includes('@')) {
+        // Email: mantém como está
+        cleanPixKey = cleanPixKey.toLowerCase();
+    }
+    else if (cleanPixKey.includes('-') && cleanPixKey.length > 20) {
+        // Chave aleatória (UUID): mantém como está
+        cleanPixKey = cleanPixKey.toLowerCase();
+    }
+    else {
+        // CPF/CNPJ: apenas números
+        cleanPixKey = onlyDigits;
     }
 
     const gui = emvField('00', 'BR.GOV.BCB.PIX');
@@ -114,28 +151,43 @@ console.log('');
 
 // Teste 2: Telefone com formatação incorreta (o problema do usuário)
 const payload2 = generatePixPayload(
+    '99981916389',
+    'AGC PARKING',
+    'BRASIL',
+    49.00,
+    'AGC480F35B3'
+);
+console.log('Teste 2 - Telefone (DEVE ADICIONAR +55):');
+console.log('Payload:', payload2);
+console.log('Tamanho:', payload2.length, 'caracteres');
+console.log('Chave formatada:', payload2.includes('+5599981916389') ? '✅ +5599981916389' : '❌ Formato incorreto');
+console.log('');
+
+// Teste 3: Telefone já formatado
+const payload3 = generatePixPayload(
     '(99) 98191-6389',
     'AGC PARKING',
     'BRASIL',
     49.00,
     'AGC480F35B3'
 );
-console.log('Teste 2 - Telefone Formatado (DEVE SER LIMPO):');
-console.log('Payload:', payload2);
-console.log('Tamanho:', payload2.length, 'caracteres');
+console.log('Teste 3 - Telefone Formatado:');
+console.log('Payload:', payload3);
+console.log('Tamanho:', payload3.length, 'caracteres');
+console.log('Chave formatada:', payload3.includes('+5599981916389') ? '✅ +5599981916389' : '❌ Formato incorreto');
 console.log('');
 
-// Teste 3: Chave Aleatória
-const payload3 = generatePixPayload(
+// Teste 4: Chave Aleatória
+const payload4 = generatePixPayload(
     'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     'AGC PARKING',
     'CURITIBA',
     200.00,
     'AGCRANDOM1'
 );
-console.log('Teste 3 - Chave Aleatória:');
-console.log('Payload:', payload3);
-console.log('Tamanho:', payload3.length, 'caracteres');
+console.log('Teste 4 - Chave Aleatória:');
+console.log('Payload:', payload4);
+console.log('Tamanho:', payload4.length, 'caracteres');
 console.log('');
 
 console.log('=== VALIDAÇÃO DA ESTRUTURA ===\n');
@@ -152,10 +204,11 @@ const validatePayload = (payload) => {
         'Contém campo 59 (Merchant Name)': payload.includes('59'),
         'Contém campo 60 (Merchant City)': payload.includes('60'),
         'Contém campo 62 (Additional Data)': payload.includes('62'),
-        'Termina com CRC (6304)': payload.includes('6304')
+        'Termina com CRC (6304)': payload.includes('6304'),
+        'Sem espaços': !payload.includes(' ')
     };
     
-    console.log('Validação do Payload 2 (Telefone Limpo):');
+    console.log('Validação do Payload 2 (Telefone):');
     for (const [check, result] of Object.entries(checks)) {
         console.log(`  ${result ? '✓' : '✗'} ${check}`);
     }
