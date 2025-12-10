@@ -1,0 +1,7 @@
+{
+  "name": "Parking System AGC 24h",
+  "description": "Sistema completo de gerenciamento de estacionamento mobile-first com painel analítico, controle de entrada/saída, cálculo de receita e reconhecimento de placas com IA.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
