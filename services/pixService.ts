@@ -47,19 +47,21 @@ export const generatePixPayload = (
     payload += emvField('58', 'BR');
 
     // Merchant Name (59)
-    // Normalizar o nome do comerciante (remover acentos e caracteres especiais)
+    // Normalizar o nome do comerciante (remover acentos, caracteres especiais e espaços)
     const normalizedMerchantName = merchantName
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '')
         .toUpperCase()
         .substring(0, 25); // Limite de 25 caracteres
     payload += emvField('59', normalizedMerchantName);
 
     // Merchant City (60)
-    // Normalizar o nome da cidade
+    // Normalizar o nome da cidade (remover acentos, caracteres especiais e espaços)
     const normalizedMerchantCity = merchantCity
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '')
         .toUpperCase()
         .substring(0, 15); // Limite de 15 caracteres
     payload += emvField('60', normalizedMerchantCity);
