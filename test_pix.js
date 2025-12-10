@@ -17,8 +17,16 @@ const generatePixPayload = (pixKey, merchantName, merchantCity, amount, txid) =>
 
     // Merchant Account Information (26)
     // Subcampos: GUI (00) e Chave Pix (01)
+    
+    // ⚠️ CORREÇÃO: Limpar a chave Pix para garantir que não haja caracteres inválidos (ex: em telefone)
+    let cleanPixKey = pixKey;
+    if (pixKey.includes('(') || pixKey.includes('-') || pixKey.includes(' ')) {
+        // Assume que é um telefone e remove tudo que não for dígito ou '+'
+        cleanPixKey = pixKey.replace(/[^0-9+]/g, '');
+    }
+
     const gui = emvField('00', 'BR.GOV.BCB.PIX');
-    const key = emvField('01', pixKey);
+    const key = emvField('01', cleanPixKey);
     const merchantAccountContent = gui + key;
     payload += emvField('26', merchantAccountContent);
 
@@ -102,56 +110,30 @@ console.log('Payload:', payload1);
 console.log('Tamanho:', payload1.length, 'caracteres');
 console.log('');
 
-// Teste 2: CNPJ
+// Teste 2: Telefone com formatação incorreta (o problema do usuário)
 const payload2 = generatePixPayload(
-    '12345678000190',
+    '(99) 98191-6389',
     'AGC PARKING',
-    'RIO DE JANEIRO',
-    100.00,
-    'AGC87654321'
+    'BRASIL',
+    49.00,
+    'AGC480F35B3'
 );
-console.log('Teste 2 - CNPJ:');
+console.log('Teste 2 - Telefone Formatado (DEVE SER LIMPO):');
 console.log('Payload:', payload2);
 console.log('Tamanho:', payload2.length, 'caracteres');
 console.log('');
 
-// Teste 3: Email
+// Teste 3: Chave Aleatória
 const payload3 = generatePixPayload(
-    'pagamento@agcparking.com.br',
-    'AGC PARKING',
-    'BRASIL',
-    50.75,
-    'AGCTEST001'
-);
-console.log('Teste 3 - Email:');
-console.log('Payload:', payload3);
-console.log('Tamanho:', payload3.length, 'caracteres');
-console.log('');
-
-// Teste 4: Telefone
-const payload4 = generatePixPayload(
-    '+5511999887766',
-    'AGC PARKING',
-    'BRASILIA',
-    15.00,
-    'AGCPHONE01'
-);
-console.log('Teste 4 - Telefone:');
-console.log('Payload:', payload4);
-console.log('Tamanho:', payload4.length, 'caracteres');
-console.log('');
-
-// Teste 5: Chave Aleatória
-const payload5 = generatePixPayload(
     'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     'AGC PARKING',
     'CURITIBA',
     200.00,
     'AGCRANDOM1'
 );
-console.log('Teste 5 - Chave Aleatória:');
-console.log('Payload:', payload5);
-console.log('Tamanho:', payload5.length, 'caracteres');
+console.log('Teste 3 - Chave Aleatória:');
+console.log('Payload:', payload3);
+console.log('Tamanho:', payload3.length, 'caracteres');
 console.log('');
 
 console.log('=== VALIDAÇÃO DA ESTRUTURA ===\n');
@@ -171,7 +153,7 @@ const validatePayload = (payload) => {
         'Termina com CRC (6304)': payload.includes('6304')
     };
     
-    console.log('Validação do Payload 1:');
+    console.log('Validação do Payload 2 (Telefone Limpo):');
     for (const [check, result] of Object.entries(checks)) {
         console.log(`  ${result ? '✓' : '✗'} ${check}`);
     }
@@ -182,7 +164,7 @@ const validatePayload = (payload) => {
     return allValid;
 };
 
-validatePayload(payload1);
+validatePayload(payload2);
 
 console.log('=== INSTRUÇÕES DE USO ===\n');
 console.log('1. Copie o payload gerado');

@@ -23,9 +23,14 @@ export const generatePixPayload = (
     let payload = emvField('00', '01');
 
     // Merchant Account Information (26)
-    // Subcampos: GUI (00) e Chave Pix (01)
+    // Subcampos: GUI (00) e Chave Pix (01)\n    \n    // ⚠️ CORREÇÃO: Limpar a chave Pix para garantir que não haja caracteres inválidos (ex: em telefone)
+    let cleanPixKey = pixKey;
+    if (pixKey.includes('(') || pixKey.includes('-') || pixKey.includes(' ')) {
+        // Assume que é um telefone e remove tudo que não for dígito ou '+'
+        cleanPixKey = pixKey.replace(/[^0-9+]/g, '');
+    }
     const gui = emvField('00', 'BR.GOV.BCB.PIX');
-    const key = emvField('01', pixKey);
+    const key = emvField('01', cleanPixKey);
     const merchantAccountContent = gui + key;
     payload += emvField('26', merchantAccountContent);
 
