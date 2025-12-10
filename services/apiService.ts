@@ -155,6 +155,9 @@ export const calculateCost = (entryTime: number, exitTime: number, type: Vehicle
 
 // --- PIX Operations (API) ---
 
+import { generatePixPayload } from './pixService';
+export { generatePixPayload };
+
 export const createPaymentIntent = async (txid: string, amount: number): Promise<boolean> => {
     try {
         const response = await fetch(`${API_BASE_URL}/payment/create`, {

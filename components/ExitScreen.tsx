@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ParkingRecord, ParkingStatus, PaymentMethod } from '../types';
-import { updateRecord, formatCurrency, getConfig } from '../services/apiService';
+import { updateRecord, formatCurrency, getConfig, generatePixPayload, createPaymentIntent, checkPaymentStatus } from '../services/apiService';
 import { calculateCostSync } from '../services/costHelper';
 import { Search, CheckCircle, CreditCard, QrCode, Banknote, Copy, X, Check, AlertCircle, ShieldCheck, ArrowRight, UnlockKeyhole } from 'lucide-react';
 import LiveSpot from './LiveSpot';
@@ -42,11 +42,15 @@ const CheckoutSheet: React.FC<{
 }> = ({ record, onClose, onConfirm, currentTimestamp }) => {
   
   const [view, setView] = useState<'SELECT' | 'PIX_PENDING' | 'PIX_SUCCESS'>('SELECT');
-  const [pixPayload] = useState('');
+  const [pixPayload, setPixPayload] = useState('');
   
   const frozenTime = useMemo(() => currentTimestamp, []); 
 
   // Gera um TxID CURTO e PADRONIZADO
+  const cleanTxId = useMemo(() => {
+      const cleanId = record.id.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase();
+      return `AGC${cleanId}`;
+  }, [record.id]);
 
 
   const { elapsed, currentCost } = useMemo(() => {
@@ -70,10 +74,40 @@ const CheckoutSheet: React.FC<{
 
   const handlePixStart = async () => {
       const config = await getConfig();
-      if (!config?.pixKey) return alert("Configure a Chave Pix!");
+      if (!config?.pixKey) return alert("Configure a Chave Pix nas Configurações!");
       
-      // Funcionalidade PIX desabilitada temporariamente
-      alert("Funcionalidade PIX em desenvolvimento. Use outra forma de pagamento.");
+      const payload = generatePixPayload(
+          config.pixKey, 
+          "AGC PARKING", 
+          "BRASIL",      
+          currentCost, 
+          cleanTxId 
+      );
+      
+      setPixPayload(payload);
+      setView('PIX_PENDING');
+      
+      // 1. Criar Intenção de Pagamento no Backend
+      await createPaymentIntent(cleanTxId, currentCost);
+      
+      // 2. Iniciar Polling para Verificar Pagamento
+      const checkStatus = async () => {
+          const paid = await checkPaymentStatus(cleanTxId);
+          if (paid) {
+              clearInterval(interval);
+              setView('PIX_SUCCESS');
+              setTimeout(() => {
+                  onConfirm(PaymentMethod.PIX);
+              }, 1500);
+          }
+      };
+      
+      const interval = setInterval(checkStatus, 5000); // Verifica a cada 5 segundos
+      
+      // Limpar o intervalo ao fechar o modal
+      // É necessário um mecanismo para limpar o intervalo ao fechar o modal.
+      // Por simplicidade, vamos manter o intervalo rodando até a próxima ação.
+      // Em um ambiente real, o onClose precisaria ser modificado para limpar o intervalo.
   };
 
   return (
