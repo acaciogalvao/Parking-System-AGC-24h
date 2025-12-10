@@ -5,7 +5,7 @@ import EntryScreen from './components/EntryScreen';
 import ExitScreen from './components/ExitScreen';
 import HistoryScreen from './components/HistoryScreen';
 import SettingsScreen from './components/SettingsScreen';
-import StatusIndicator from './components/StatusIndicator';
+
 import { getRecords, initData } from './services/apiService';
 import { ParkingRecord } from './types';
 
@@ -77,12 +77,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-6">
-            <div className="flex justify-end mb-4">
-              <StatusIndicator />
-            </div>
-            {renderContent()}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6">\n            {renderContent()}\n        </main>
 
         {/* Bottom Navigation */}
         <nav className="bg-white border-t border-slate-100 h-20 shrink-0 flex justify-around items-center px-2 pb-2 sticky bottom-0 z-40 shadow-[0_-8px_20px_-5px_rgba(0,0,0,0.05)] rounded-t-3xl">

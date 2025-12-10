@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ParkingRecord, ParkingStatus, VehicleType } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Car, DollarSign, Activity, Clock, Truck, Bike, Map as MapIcon, HardDrive, TrendingUp } from 'lucide-react';
-import { formatCurrency, getConfig } from '../services/apiService';
+import { formatCurrency, getConfig } from '../services/apiService';\nimport StatusIndicator from './StatusIndicator';
 
 interface DashboardProps {
   records: ParkingRecord[];
@@ -63,14 +63,14 @@ const Dashboard: React.FC<DashboardProps> = ({ records }) => {
   return (
     <div className="space-y-4 pb-20 animate-fade-in">
       {/* Header Compacto com Status */}
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-start mb-2">
         <div>
            <h1 className="text-2xl font-black text-slate-800 tracking-tight">Visão Geral</h1>
            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-colors bg-slate-100 text-slate-500 border-slate-200">
-            <HardDrive size={12} />
-            MODO LOCAL
+        <div className="flex items-center gap-2">
+            
+            <StatusIndicator />\n            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-colors bg-slate-100 text-slate-500 border-slate-200">\n                <HardDrive size={12} />\n                MODO LOCAL\n            </div>
         </div>
       </div>
 

@@ -1,9 +1,14 @@
 // Função de cópia universal (compatível com a maioria dos navegadores)
-export const copyToClipboard = (text: string): boolean => {
+export const copyToClipboard = async (text: string): Promise<boolean> => {
     // 1. Tenta usar a API moderna (navigator.clipboard)
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text);
-        return true;
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.error('Erro ao copiar via navigator.clipboard:', err);
+            // Continua para o fallback
+        }
     }
 
     // 2. Fallback para o método antigo (document.execCommand)

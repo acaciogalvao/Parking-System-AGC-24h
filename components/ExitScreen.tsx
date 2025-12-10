@@ -186,7 +186,7 @@ const CheckoutSheet: React.FC<{
 
                     {/* Botões de Ação */}
                     <div className="grid grid-cols-2 gap-3 w-full">
-                         <button onClick={() => { copyToClipboard(pixPayload); alert('Código Copiado!'); }} className="flex items-center justify-center gap-2 text-xs font-bold bg-slate-50 py-3 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">
+                         <button onClick={async () => { const success = await copyToClipboard(pixPayload); if (success) alert('Código Copiado!'); else alert('Erro ao copiar código. Tente novamente.'); }} className="flex items-center justify-center gap-2 text-xs font-bold bg-slate-50 py-3 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">
                             <Copy size={14}/> Copiar Código
                         </button>
                         <button onClick={() => setView('SELECT')} className="flex items-center justify-center gap-2 text-xs font-bold bg-slate-50 py-3 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">
